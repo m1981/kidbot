@@ -65,12 +65,10 @@ graph TD
     subgraph Dev_Tools ["Development Tools"]
         VSCode["VS Code + PlatformIO"]
         M5Burner["M5Burner"]
-        Wireshark["Wireshark"]
         UiFlow["UiFlow 2.0"]
         Firmware["(Firmware Build)"]
         
         VSCode -.->|Compiles| Firmware
-        UiFlow -.->|Prototyping| Firmware
     end
 
     %% Subgraph for The Firmware Stack
@@ -83,16 +81,9 @@ graph TD
             FreeRTOS["FreeRTOS"]
         end
         
-        subgraph Framework ["Framework"]
-            Arduino["Arduino Framework"]
-            ESPIDF["ESP-IDF Core"]
-        end
-        
         AppLogic --> M5Unified
         AppLogic --> FreeRTOS
         M5Unified --> M5GFX
-        M5Unified --> Arduino
-        Arduino --> ESPIDF
     end
 
     %% Subgraph for Physical Hardware
@@ -102,24 +93,26 @@ graph TD
         subgraph Peripherals ["Peripherals"]
             PSRAM["8MB PSRAM (OPI)"]
             Audio["Audio Subsystem<br/>ES8311 Codec + AW8737 Amp"]
-            Mic["MEMS Microphone"]
+            Mic["SPM1423 MEMS Mic"]
             PMU["AXP2101 PMU"]
-            USB["USB-Serial (CH9102)"]
+            IMU["MPU6886 IMU<br/>(Accelerometer/Gyro)"]
+            Screen["ST7789 LCD Controller"]
         end
         
         ESP32S3 --> PSRAM
         ESP32S3 --> Audio
         ESP32S3 --> Mic
         ESP32S3 --> PMU
-        ESP32S3 --> USB
+        ESP32S3 --> IMU
+        ESP32S3 --> Screen
     end
 
-    %% Relationships between major blocks
+    %% Relationships
     Firmware_Stack -->|Runs On| Hardware
     Firmware_Stack <-->|HTTPS Requests| Cloud_Services
     Dev_Tools -->|Flashes via USB| Hardware
-
-    %% Specific Hardware Accelerations
-    ESP32S3 -.->|Accelerates| SSL
-    ESP32S3 -.->|DMA Transfer| Audio
+    
+    %% Feature Mapping
+    IMU -.->|Enables| Shake_Gestures["Shake Gestures"]
+    Audio -.->|Enables| Voice_Response["Voice Response"]
 ```
